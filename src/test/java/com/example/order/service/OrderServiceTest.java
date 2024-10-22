@@ -3,6 +3,7 @@ package com.example.order.service;
 import com.example.order.dto.OrderDto;
 import com.example.order.exceptions.CustomerIdCannotBeNullOrNegativeException;
 import com.example.order.exceptions.OrderItemsCannotBeNullOrEmptyException;
+import com.example.order.exceptions.OrderNotFoundException;
 import com.example.order.exceptions.RestaurantIdCannotBeNullOrNegativeException;
 import com.example.order.model.Order;
 import com.example.order.model.OrderItem;
@@ -13,9 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -122,4 +121,56 @@ class OrderServiceTest {
         });
         assertEquals("Order items cannot be null or empty", exception.getMessage());
     }
+
+    @Test
+    void testGetAllOrders() {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
+        List<OrderItem> orderItems = Arrays.asList(item1, item2);
+
+        Order order1 = new Order(1L, 1L, orderItems);
+        Order order2 = new Order(2L, 1L, orderItems);
+        List<Order> expectedOrders = Arrays.asList(order1, order2);
+
+        when(orderRepository.findAll()).thenReturn(expectedOrders);
+
+        List<Order> orders = orderService.getAllOrders();
+
+        assertEquals(2, orders.size());
+        assertEquals(expectedOrders, orders);
+    }
+
+    @Test
+    void testGetOrdersWhenNoAllOrders() {
+        when(orderRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<Order> orders = orderService.getAllOrders();
+
+        assertEquals(0, orders.size());
+    }
+
+
+    @Test
+    void testGetOrderByIdSuccessfully() {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = Collections.singletonList(item1);
+        Order expectedOrder = new Order(1L, 1L, orderItems);
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(expectedOrder));
+
+        Order order = orderService.getOrderById(1L);
+
+        assertEquals(expectedOrder, order);
+    }
+
+    @Test
+    void testGetOrderByIdWhenOrderNotFound() {
+        when(orderRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(OrderNotFoundException.class, () -> {
+            orderService.getOrderById(99L);
+        });
+        assertEquals("Order not found with id: 99", exception.getMessage());
+    }
+
 }

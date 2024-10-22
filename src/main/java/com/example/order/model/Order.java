@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -18,10 +19,8 @@ public class Order {
 
     private Long restaurantId;
     private Long customerId;
-    @Getter
     private double totalPrice;
 
-    @Getter
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 

@@ -406,4 +406,71 @@ class OrderControllerTest {
 
         verify(orderService, times(1)).createOrder(any(OrderDto.class));
     }
+
+    @Test
+    void testGetAllOrders() throws Exception {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = Collections.singletonList(item1);
+
+        Order order1 = new Order(1L, 1L, orderItems);
+        Order order2 = new Order(2L, 1L, orderItems);
+        List<Order> expectedOrders = Arrays.asList(order1, order2);
+        String expectedResponseBody = objectMapper.writeValueAsString(expectedOrders);
+
+        when(orderService.getAllOrders()).thenReturn(expectedOrders);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/orders")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        assertEquals(expectedResponseBody, responseBody);
+        verify(orderService, times(1)).getAllOrders();
+    }
+
+    @Test
+    void testGetOrdersWhenNoAllOrders() throws Exception {
+        when(orderService.getAllOrders()).thenReturn(Collections.emptyList());
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/orders")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        assertEquals("[]", responseBody);
+        verify(orderService, times(1)).getAllOrders();
+    }
+
+    @Test
+    void testGetOrderByIdSuccessfully() throws Exception {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = Collections.singletonList(item1);
+        Order expectedOrder = new Order(1L, 1L, orderItems);
+        String expectedResponseBody = objectMapper.writeValueAsString(expectedOrder);
+
+        when(orderService.getOrderById(1L)).thenReturn(expectedOrder);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/orders/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        assertEquals(expectedResponseBody, responseBody);
+        verify(orderService, times(1)).getOrderById(1L);
+    }
+
+    @Test
+    void testGetOrderByIdWhenOrderNotFound() throws Exception {
+        when(orderService.getOrderById(99L)).thenThrow(new OrderNotFoundException("Order not found with id: 99"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/orders/99")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Not Found: Order not found with id: 99"));
+
+        verify(orderService, times(1)).getOrderById(99L);
+    }
 }

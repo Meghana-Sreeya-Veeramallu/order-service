@@ -2,6 +2,7 @@ package com.example.order.service;
 
 import com.example.order.dto.OrderDto;
 import com.example.order.exceptions.OrderItemsCannotBeNullOrEmptyException;
+import com.example.order.exceptions.OrderNotFoundException;
 import com.example.order.model.Order;
 import com.example.order.model.OrderItem;
 import com.example.order.repository.OrderRepository;
@@ -33,5 +34,14 @@ public class OrderService {
 
         Order order = new Order(orderDto.getRestaurantId(), orderDto.getCustomerId(), mappedOrderItems);
         return orderRepository.save(order);
+    }
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    public Order getOrderById(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
     }
 }

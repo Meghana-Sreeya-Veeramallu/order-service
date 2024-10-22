@@ -7,6 +7,7 @@ import com.example.order.exceptions.QuantityCannotBeNullOrNegativeException;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "orderItems")
 public class OrderItem {
@@ -16,9 +17,7 @@ public class OrderItem {
 
     private Long menuItemId;
     private String menuItemName;
-    @Getter
     private double price;
-    @Getter
     private int quantity;
 
     public OrderItem(Long menuItemId, String menuItemName, double price, int quantity) {

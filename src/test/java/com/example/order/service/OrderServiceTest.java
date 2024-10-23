@@ -1,5 +1,6 @@
 package com.example.order.service;
 
+import com.example.order.dto.MenuItemDto;
 import com.example.order.dto.OrderDto;
 import com.example.order.exceptions.*;
 import com.example.order.model.Order;
@@ -26,6 +27,9 @@ class OrderServiceTest {
     @Mock
     private OrderRepository orderRepository;
 
+    @Mock
+    private CatalogClientService catalogClientService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -36,12 +40,18 @@ class OrderServiceTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto order = new OrderDto(1L, 1L, "Nizampet, Hyderabad", orderItems);
+        OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", orderItems);
+
+        MenuItemDto menuItemDto1 = new MenuItemDto(1L, "Pizza", 199.0);
+        MenuItemDto menuItemDto2 = new MenuItemDto(2L, "Burger", 99.0);
+
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 1L)).thenReturn(menuItemDto1);
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 2L)).thenReturn(menuItemDto2);
 
         Order expectedOrder = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
         when(orderRepository.save(any(Order.class))).thenReturn(expectedOrder);
 
-        Order createdOrder = orderService.createOrder(order);
+        Order createdOrder = orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
 
         verify(orderRepository, times(1)).save(any(Order.class));
         assertEquals(497.0, createdOrder.getTotalPrice());
@@ -55,7 +65,7 @@ class OrderServiceTest {
         OrderDto orderDto = new OrderDto(null, 1L, "Nizampet, Hyderabad", orderItems);
 
         Exception exception = assertThrows(RestaurantIdCannotBeNullOrNegativeException.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Restaurant ID cannot be null and must be greater than zero", exception.getMessage());
     }
@@ -68,7 +78,7 @@ class OrderServiceTest {
         OrderDto orderDto = new OrderDto(-1L, 1L, "Nizampet, Hyderabad", orderItems);
 
         Exception exception = assertThrows(RestaurantIdCannotBeNullOrNegativeException.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Restaurant ID cannot be null and must be greater than zero", exception.getMessage());
     }
@@ -80,8 +90,14 @@ class OrderServiceTest {
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
         OrderDto orderDto = new OrderDto(1L, null, "Nizampet, Hyderabad", orderItems);
 
+        MenuItemDto menuItemDto1 = new MenuItemDto(1L, "Pizza", 199.0);
+        MenuItemDto menuItemDto2 = new MenuItemDto(2L, "Burger", 99.0);
+
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 1L)).thenReturn(menuItemDto1);
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 2L)).thenReturn(menuItemDto2);
+
         Exception exception = assertThrows(CustomerIdCannotBeNullOrNegativeException.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Customer ID cannot be null and must be greater than zero", exception.getMessage());
     }
@@ -93,8 +109,14 @@ class OrderServiceTest {
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
         OrderDto orderDto = new OrderDto(1L, -1L, "Nizampet, Hyderabad", orderItems);
 
+        MenuItemDto menuItemDto1 = new MenuItemDto(1L, "Pizza", 199.0);
+        MenuItemDto menuItemDto2 = new MenuItemDto(2L, "Burger", 99.0);
+
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 1L)).thenReturn(menuItemDto1);
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 2L)).thenReturn(menuItemDto2);
+
         Exception exception = assertThrows(CustomerIdCannotBeNullOrNegativeException.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Customer ID cannot be null and must be greater than zero", exception.getMessage());
     }
@@ -106,8 +128,14 @@ class OrderServiceTest {
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
         OrderDto orderDto = new OrderDto(1L, 1L, null, orderItems);
 
+        MenuItemDto menuItemDto1 = new MenuItemDto(1L, "Pizza", 199.0);
+        MenuItemDto menuItemDto2 = new MenuItemDto(2L, "Burger", 99.0);
+
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 1L)).thenReturn(menuItemDto1);
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 2L)).thenReturn(menuItemDto2);
+
         Exception exception = assertThrows(DeliveryAddressCannotBeNullOrEmpty.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Delivery address cannot be null or empty", exception.getMessage());
     }
@@ -119,8 +147,14 @@ class OrderServiceTest {
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
         OrderDto orderDto = new OrderDto(1L, 1L, "", orderItems);
 
+        MenuItemDto menuItemDto1 = new MenuItemDto(1L, "Pizza", 199.0);
+        MenuItemDto menuItemDto2 = new MenuItemDto(2L, "Burger", 99.0);
+
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 1L)).thenReturn(menuItemDto1);
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 2L)).thenReturn(menuItemDto2);
+
         Exception exception = assertThrows(DeliveryAddressCannotBeNullOrEmpty.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Delivery address cannot be null or empty", exception.getMessage());
     }
@@ -130,7 +164,7 @@ class OrderServiceTest {
         OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", null);
 
         Exception exception = assertThrows(OrderItemsCannotBeNullOrEmptyException.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Order items cannot be null or empty", exception.getMessage());
     }
@@ -140,9 +174,24 @@ class OrderServiceTest {
         OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", Collections.emptyList());
 
         Exception exception = assertThrows(OrderItemsCannotBeNullOrEmptyException.class, () -> {
-            orderService.createOrder(orderDto);
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         });
         assertEquals("Order items cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    void testCreateOrderWhenMenuItemDoesNotExist() {
+        OrderItem item1 = new OrderItem(10L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = List.of(item1);
+        OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", orderItems);
+
+        when(catalogClientService.getMenuItemByIdAndRestaurantId(1L, 10L)).thenThrow(new MenuItemNotFoundException("Failed to retrieve the menu item with restaurant id: 1 and menu item id: 10"));
+
+        Exception exception = assertThrows(MenuItemNotFoundException.class, () -> {
+            orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
+        });
+        assertEquals("Menu item with restaurant id: 1 and menu item id: 10 is not found", exception.getMessage());
+        verify(orderRepository, times(0)).save(any(Order.class));
     }
 
     @Test

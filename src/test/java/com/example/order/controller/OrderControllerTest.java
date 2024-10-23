@@ -51,7 +51,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         Order createdOrder = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
-        when(orderService.createOrder(any(OrderDto.class))).thenReturn(createdOrder);
+        when(orderService.createOrder(any(), any(), any(), any())).thenReturn(createdOrder);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -61,7 +61,7 @@ class OrderControllerTest {
 
         String responseBody = mvcResult.getResponse().getContentAsString();
         assertEquals("Order created successfully with total price 497.0", responseBody);
-        verify(orderService, times(1)).createOrder(any(OrderDto.class));
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -73,7 +73,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new RestaurantIdCannotBeNullOrNegativeException("Restaurant ID cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Restaurant ID cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -92,7 +92,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new RestaurantIdCannotBeNullOrNegativeException("Restaurant ID cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +100,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Restaurant ID cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -111,7 +111,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new CustomerIdCannotBeNullOrNegativeException("Customer ID cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +119,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Customer ID cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -130,7 +130,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new CustomerIdCannotBeNullOrNegativeException("Customer ID cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -138,7 +138,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Customer ID cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -149,7 +149,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new DeliveryAddressCannotBeNullOrEmpty("Delivery address cannot be null or empty"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -157,7 +157,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Delivery address cannot be null or empty"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -168,7 +168,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new DeliveryAddressCannotBeNullOrEmpty("Delivery address cannot be null or empty"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +176,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Delivery address cannot be null or empty"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
 
@@ -186,7 +186,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new OrderItemsCannotBeNullOrEmptyException("Order items cannot be null or empty"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,7 +194,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Order items cannot be null or empty"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -203,7 +203,7 @@ class OrderControllerTest {
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new OrderItemsCannotBeNullOrEmptyException("Order items cannot be null or empty"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +211,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Order items cannot be null or empty"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -219,12 +219,11 @@ class OrderControllerTest {
         String jsonRequestBody = """
                 {
                    "restaurantId": 3,
+                   "deliveryAddress": "Nizampet, Hyderabad",
                    "customerId": 1,
                    "orderItems": [
                      {
                        "menuItemId": null,
-                       "menuItemName": "Choco Lava cake",
-                       "price": 249,
                        "quantity": 5
                      }
                    ]
@@ -232,7 +231,7 @@ class OrderControllerTest {
         """;
 
         doThrow(new MenuItemIdCannotBeNullOrNegativeException("Menu item ID cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -240,7 +239,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Menu item ID cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any());
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -249,11 +248,10 @@ class OrderControllerTest {
                 {
                    "restaurantId": 3,
                    "customerId": 1,
+                   "deliveryAddress": "Nizampet, Hyderabad",
                    "orderItems": [
                      {
                        "menuItemId": -1,
-                       "menuItemName": "Choco Lava cake",
-                       "price": 249,
                        "quantity": 5
                      }
                    ]
@@ -261,7 +259,7 @@ class OrderControllerTest {
         """;
 
         doThrow(new MenuItemIdCannotBeNullOrNegativeException("Menu item ID cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -269,123 +267,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Menu item ID cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any());
-    }
-
-    @Test
-    void testCreateOrderWithNullMenuItemName() throws Exception {
-        String jsonRequestBody = """
-                {
-                   "restaurantId": 3,
-                   "customerId": 1,
-                   "orderItems": [
-                     {
-                       "menuItemId": 1,
-                       "menuItemName": null,
-                       "price": 249,
-                       "quantity": 5
-                     }
-                   ]
-                 }
-        """;
-
-        doThrow(new MenuItemNameCannotBeNullOrEmptyException("Menu item name cannot be null or empty"))
-                .when(orderService).createOrder(any(OrderDto.class));
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Bad Request: Menu item name cannot be null or empty"));
-
-        verify(orderService, times(1)).createOrder(any());
-    }
-
-    @Test
-    void testCreateOrderWithEmptyMenuItemName() throws Exception {
-        String jsonRequestBody = """
-                {
-                   "restaurantId": 3,
-                   "customerId": 1,
-                   "orderItems": [
-                     {
-                       "menuItemId": 1,
-                       "menuItemName": " ",
-                       "price": 249,
-                       "quantity": 5
-                     }
-                   ]
-                 }
-        """;
-
-        doThrow(new MenuItemNameCannotBeNullOrEmptyException("Menu item name cannot be null or empty"))
-                .when(orderService).createOrder(any(OrderDto.class));
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Bad Request: Menu item name cannot be null or empty"));
-
-        verify(orderService, times(1)).createOrder(any());
-    }
-
-    @Test
-    void testCreateOrderWithZeroPrice() throws Exception {
-        String jsonRequestBody = """
-            {
-               "restaurantId": 3,
-               "customerId": 1,
-               "orderItems": [
-                 {
-                   "menuItemId": 1,
-                   "menuItemName": "Choco Lava cake",
-                   "price": 0,
-                   "quantity": 5
-                 }
-               ]
-             }
-        """;
-
-        doThrow(new PriceCannotBeNullOrNegativeException("Price cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Bad Request: Price cannot be null and must be greater than zero"));
-
-        verify(orderService, times(1)).createOrder(any(OrderDto.class));
-    }
-
-    @Test
-    void testCreateOrderWithNegativePrice() throws Exception {
-        String jsonRequestBody = """
-            {
-               "restaurantId": 3,
-               "customerId": 1,
-               "orderItems": [
-                 {
-                   "menuItemId": 1,
-                   "menuItemName": "Choco Lava cake",
-                   "price": -10,
-                   "quantity": 5
-                 }
-               ]
-             }
-        """;
-
-        doThrow(new PriceCannotBeNullOrNegativeException("Price cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Bad Request: Price cannot be null and must be greater than zero"));
-
-        verify(orderService, times(1)).createOrder(any(OrderDto.class));
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -394,11 +276,10 @@ class OrderControllerTest {
             {
                "restaurantId": 3,
                "customerId": 1,
+               "deliveryAddress": "Nizampet, Hyderabad",
                "orderItems": [
                  {
                    "menuItemId": 1,
-                   "menuItemName": "Choco Lava cake",
-                   "price": 249,
                    "quantity": 0
                  }
                ]
@@ -406,7 +287,7 @@ class OrderControllerTest {
         """;
 
         doThrow(new QuantityCannotBeNullOrNegativeException("Quantity cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -414,7 +295,7 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Quantity cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any(OrderDto.class));
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test
@@ -423,11 +304,10 @@ class OrderControllerTest {
             {
                "restaurantId": 3,
                "customerId": 1,
+               "deliveryAddress": "Nizampet, Hyderabad",
                "orderItems": [
                  {
                    "menuItemId": 1,
-                   "menuItemName": "Choco Lava cake",
-                   "price": 249,
                    "quantity": -5
                  }
                ]
@@ -435,7 +315,7 @@ class OrderControllerTest {
         """;
 
         doThrow(new QuantityCannotBeNullOrNegativeException("Quantity cannot be null and must be greater than zero"))
-                .when(orderService).createOrder(any(OrderDto.class));
+                .when(orderService).createOrder(any(), any(), any(), any());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -443,7 +323,35 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Bad Request: Quantity cannot be null and must be greater than zero"));
 
-        verify(orderService, times(1)).createOrder(any(OrderDto.class));
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
+    }
+
+    @Test
+    void testCreateOrderWhenMenuItemDoesNotExist() throws Exception {
+        String jsonRequestBody = """
+            {
+               "restaurantId": 1,
+               "customerId": 1,
+               "deliveryAddress": "Nizampet, Hyderabad",
+               "orderItems": [
+                 {
+                   "menuItemId": 10,
+                   "quantity": 5
+                 }
+               ]
+             }
+        """;
+
+        doThrow(new MenuItemNotFoundException("Menu item with restaurant id: 1 and menu item id: 10 is not found"))
+                .when(orderService).createOrder(any(), any(), any(), any());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequestBody))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Not Found: Menu item with restaurant id: 1 and menu item id: 10 is not found"));
+
+        verify(orderService, times(1)).createOrder(any(), any(), any(), any());
     }
 
     @Test

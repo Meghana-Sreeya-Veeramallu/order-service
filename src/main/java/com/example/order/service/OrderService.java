@@ -1,8 +1,7 @@
 package com.example.order.service;
 
-import com.example.order.dto.OrderDto;
-import com.example.order.exceptions.OrderItemsCannotBeNullOrEmptyException;
-import com.example.order.exceptions.OrderNotFoundException;
+import com.example.order.dto.MenuItemDto;
+import com.example.order.exceptions.*;
 import com.example.order.model.Order;
 import com.example.order.model.OrderItem;
 import com.example.order.repository.OrderRepository;
@@ -15,25 +14,44 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final CatalogClientService catalogClientService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, CatalogClientService catalogClientService) {
         this.orderRepository = orderRepository;
+        this.catalogClientService = catalogClientService;
     }
 
-    public Order createOrder(OrderDto orderDto) {
-        List<OrderItem> orderItems = orderDto.getOrderItems();
-
+    public Order createOrder(Long restaurantId, Long customerId, String deliveryAddress, List<OrderItem> orderItems) {
+        if (restaurantId == null || restaurantId <= 0) {
+            throw new RestaurantIdCannotBeNullOrNegativeException("Restaurant ID cannot be null and must be greater than zero");
+        }
         if (orderItems == null || orderItems.isEmpty()) {
             throw new OrderItemsCannotBeNullOrEmptyException("Order items cannot be null or empty");
         }
 
         List<OrderItem> mappedOrderItems = orderItems.stream()
-                .map(item -> new OrderItem(item.getMenuItemId(), item.getMenuItemName(), item.getPrice(), item.getQuantity()))
+                .map(item -> {
+                    MenuItemDto menuItemDto = getMenuItemByIdAndRestaurantId(restaurantId, item.getMenuItemId(), catalogClientService);
+                    return new OrderItem(item.getMenuItemId(), menuItemDto.getName(), menuItemDto.getPrice(), item.getQuantity());
+                })
                 .collect(Collectors.toList());
 
-        Order order = new Order(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), mappedOrderItems);
+        Order order = new Order(restaurantId, customerId, deliveryAddress, mappedOrderItems);
         return orderRepository.save(order);
+    }
+
+    private MenuItemDto getMenuItemByIdAndRestaurantId(Long restaurantId, Long menuItemId, CatalogClientService catalogClientService) {
+        if (menuItemId == null || menuItemId <= 0) {
+            throw new MenuItemIdCannotBeNullOrNegativeException("Menu item ID cannot be null and must be greater than zero");
+        }
+        MenuItemDto menuItem;
+        try {
+            menuItem = catalogClientService.getMenuItemByIdAndRestaurantId(restaurantId, menuItemId);
+        } catch (Exception e) {
+            throw new MenuItemNotFoundException("Menu item with restaurant id: "+ restaurantId + " and menu item id: " + menuItemId + " is not found");
+        }
+        return menuItem;
     }
 
     public List<Order> getAllOrders() {

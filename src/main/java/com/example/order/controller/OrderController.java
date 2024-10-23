@@ -21,7 +21,7 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<String> createOrder(@RequestBody OrderDto orderDto) {
-        Order createdOrder = orderService.createOrder(orderDto);
+        Order createdOrder = orderService.createOrder(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), orderDto.getOrderItems());
         String successMessage = "Order created successfully with total price " + createdOrder.getTotalPrice();
         return ResponseEntity.ok(successMessage);
     }

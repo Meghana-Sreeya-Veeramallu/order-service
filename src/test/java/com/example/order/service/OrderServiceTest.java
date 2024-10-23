@@ -1,10 +1,7 @@
 package com.example.order.service;
 
 import com.example.order.dto.OrderDto;
-import com.example.order.exceptions.CustomerIdCannotBeNullOrNegativeException;
-import com.example.order.exceptions.OrderItemsCannotBeNullOrEmptyException;
-import com.example.order.exceptions.OrderNotFoundException;
-import com.example.order.exceptions.RestaurantIdCannotBeNullOrNegativeException;
+import com.example.order.exceptions.*;
 import com.example.order.model.Order;
 import com.example.order.model.OrderItem;
 import com.example.order.repository.OrderRepository;
@@ -39,9 +36,9 @@ class OrderServiceTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto order = new OrderDto(1L, 1L, orderItems);
+        OrderDto order = new OrderDto(1L, 1L, "Nizampet, Hyderabad", orderItems);
 
-        Order expectedOrder = new Order(1L, 1L, orderItems);
+        Order expectedOrder = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
         when(orderRepository.save(any(Order.class))).thenReturn(expectedOrder);
 
         Order createdOrder = orderService.createOrder(order);
@@ -55,7 +52,7 @@ class OrderServiceTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto orderDto = new OrderDto(null, 1L, orderItems);
+        OrderDto orderDto = new OrderDto(null, 1L, "Nizampet, Hyderabad", orderItems);
 
         Exception exception = assertThrows(RestaurantIdCannotBeNullOrNegativeException.class, () -> {
             orderService.createOrder(orderDto);
@@ -68,7 +65,7 @@ class OrderServiceTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto orderDto = new OrderDto(-1L, 1L, orderItems);
+        OrderDto orderDto = new OrderDto(-1L, 1L, "Nizampet, Hyderabad", orderItems);
 
         Exception exception = assertThrows(RestaurantIdCannotBeNullOrNegativeException.class, () -> {
             orderService.createOrder(orderDto);
@@ -81,7 +78,7 @@ class OrderServiceTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto orderDto = new OrderDto(1L, null, orderItems);
+        OrderDto orderDto = new OrderDto(1L, null, "Nizampet, Hyderabad", orderItems);
 
         Exception exception = assertThrows(CustomerIdCannotBeNullOrNegativeException.class, () -> {
             orderService.createOrder(orderDto);
@@ -94,7 +91,7 @@ class OrderServiceTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto orderDto = new OrderDto(1L, -1L, orderItems);
+        OrderDto orderDto = new OrderDto(1L, -1L, "Nizampet, Hyderabad", orderItems);
 
         Exception exception = assertThrows(CustomerIdCannotBeNullOrNegativeException.class, () -> {
             orderService.createOrder(orderDto);
@@ -103,8 +100,34 @@ class OrderServiceTest {
     }
 
     @Test
+    void testCreateOrderWithNullDeliveryAddress() {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
+        List<OrderItem> orderItems = Arrays.asList(item1, item2);
+        OrderDto orderDto = new OrderDto(1L, 1L, null, orderItems);
+
+        Exception exception = assertThrows(DeliveryAddressCannotBeNullOrEmpty.class, () -> {
+            orderService.createOrder(orderDto);
+        });
+        assertEquals("Delivery address cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    void testCreateOrderWithEmptyDeliveryAddress() {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
+        List<OrderItem> orderItems = Arrays.asList(item1, item2);
+        OrderDto orderDto = new OrderDto(1L, 1L, "", orderItems);
+
+        Exception exception = assertThrows(DeliveryAddressCannotBeNullOrEmpty.class, () -> {
+            orderService.createOrder(orderDto);
+        });
+        assertEquals("Delivery address cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
     void testCreateOrderWithNullItems() {
-        OrderDto orderDto = new OrderDto(1L, 1L, null);
+        OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", null);
 
         Exception exception = assertThrows(OrderItemsCannotBeNullOrEmptyException.class, () -> {
             orderService.createOrder(orderDto);
@@ -114,7 +137,7 @@ class OrderServiceTest {
 
     @Test
     void testCreateOrderWithEmptyItems() {
-        OrderDto orderDto = new OrderDto(1L, 1L, Collections.emptyList());
+        OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", Collections.emptyList());
 
         Exception exception = assertThrows(OrderItemsCannotBeNullOrEmptyException.class, () -> {
             orderService.createOrder(orderDto);
@@ -128,8 +151,8 @@ class OrderServiceTest {
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
 
-        Order order1 = new Order(1L, 1L, orderItems);
-        Order order2 = new Order(2L, 1L, orderItems);
+        Order order1 = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
+        Order order2 = new Order(2L, 1L, "Nizampet, Hyderabad", orderItems);
         List<Order> expectedOrders = Arrays.asList(order1, order2);
 
         when(orderRepository.findAll()).thenReturn(expectedOrders);
@@ -154,7 +177,7 @@ class OrderServiceTest {
     void testGetOrderByIdSuccessfully() {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         List<OrderItem> orderItems = Collections.singletonList(item1);
-        Order expectedOrder = new Order(1L, 1L, orderItems);
+        Order expectedOrder = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
 
         when(orderRepository.findById(1L)).thenReturn(Optional.of(expectedOrder));
 
@@ -172,5 +195,4 @@ class OrderServiceTest {
         });
         assertEquals("Order not found with id: 99", exception.getMessage());
     }
-
 }

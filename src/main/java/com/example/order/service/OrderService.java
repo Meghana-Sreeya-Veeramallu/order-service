@@ -32,7 +32,7 @@ public class OrderService {
                 .map(item -> new OrderItem(item.getMenuItemId(), item.getMenuItemName(), item.getPrice(), item.getQuantity()))
                 .collect(Collectors.toList());
 
-        Order order = new Order(orderDto.getRestaurantId(), orderDto.getCustomerId(), mappedOrderItems);
+        Order order = new Order(orderDto.getRestaurantId(), orderDto.getCustomerId(), orderDto.getDeliveryAddress(), mappedOrderItems);
         return orderRepository.save(order);
     }
 

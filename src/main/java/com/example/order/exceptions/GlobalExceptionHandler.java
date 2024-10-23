@@ -13,6 +13,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + ex.getMessage());
     }
 
+    @ExceptionHandler(DeliveryAddressCannotBeNullOrEmpty.class)
+    public ResponseEntity<String> handleDeliveryAddressCannotBeNullOrEmpty(DeliveryAddressCannotBeNullOrEmpty ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + ex.getMessage());
+    }
+
     @ExceptionHandler(MenuItemIdCannotBeNullOrNegativeException.class)
     public ResponseEntity<String> handleMenuItemIdCannotBeNullOrNegative(MenuItemIdCannotBeNullOrNegativeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request: " + ex.getMessage());

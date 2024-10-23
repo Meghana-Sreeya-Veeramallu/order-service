@@ -47,10 +47,10 @@ class OrderControllerTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto orderDto = new OrderDto(1L, 1L, orderItems);
+        OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", orderItems);
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
-        Order createdOrder = new Order(1L, 1L, orderItems);
+        Order createdOrder = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
         when(orderService.createOrder(any(OrderDto.class))).thenReturn(createdOrder);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/orders")
@@ -69,7 +69,7 @@ class OrderControllerTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         OrderItem item2 = new OrderItem(2L, "Burger", 99.0, 1);
         List<OrderItem> orderItems = Arrays.asList(item1, item2);
-        OrderDto orderDto = new OrderDto(null, 1L, orderItems);
+        OrderDto orderDto = new OrderDto(null, 1L, "Nizampet, Hyderabad", orderItems);
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new RestaurantIdCannotBeNullOrNegativeException("Restaurant ID cannot be null and must be greater than zero"))
@@ -88,7 +88,7 @@ class OrderControllerTest {
     void testCreateOrderWithNegativeRestaurantId() throws Exception {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         List<OrderItem> orderItems = Collections.singletonList(item1);
-        OrderDto orderDto = new OrderDto(-1L, 1L, orderItems);
+        OrderDto orderDto = new OrderDto(-1L, 1L, "Nizampet, Hyderabad", orderItems);
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new RestaurantIdCannotBeNullOrNegativeException("Restaurant ID cannot be null and must be greater than zero"))
@@ -107,7 +107,7 @@ class OrderControllerTest {
     void testCreateOrderWithNullCustomerId() throws Exception {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         List<OrderItem> orderItems = Collections.singletonList(item1);
-        OrderDto orderDto = new OrderDto(1L, null, orderItems);
+        OrderDto orderDto = new OrderDto(1L, null, "Nizampet, Hyderabad", orderItems);
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new CustomerIdCannotBeNullOrNegativeException("Customer ID cannot be null and must be greater than zero"))
@@ -126,7 +126,7 @@ class OrderControllerTest {
     void testCreateOrderWithNegativeCustomerId() throws Exception {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         List<OrderItem> orderItems = Collections.singletonList(item1);
-        OrderDto orderDto = new OrderDto(1L, -1L, orderItems);
+        OrderDto orderDto = new OrderDto(1L, -1L, "Nizampet, Hyderabad", orderItems);
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new CustomerIdCannotBeNullOrNegativeException("Customer ID cannot be null and must be greater than zero"))
@@ -142,8 +142,47 @@ class OrderControllerTest {
     }
 
     @Test
+    void testCreateOrderWithNullDeliveryAddress() throws Exception {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = Collections.singletonList(item1);
+        OrderDto orderDto = new OrderDto(1L, 1L, null, orderItems);
+        String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
+
+        doThrow(new DeliveryAddressCannotBeNullOrEmpty("Delivery address cannot be null or empty"))
+                .when(orderService).createOrder(any(OrderDto.class));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Bad Request: Delivery address cannot be null or empty"));
+
+        verify(orderService, times(1)).createOrder(any());
+    }
+
+    @Test
+    void testCreateOrderWithEmptyDeliveryAddress() throws Exception {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = Collections.singletonList(item1);
+        OrderDto orderDto = new OrderDto(1L, 1L, "", orderItems);
+        String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
+
+        doThrow(new DeliveryAddressCannotBeNullOrEmpty("Delivery address cannot be null or empty"))
+                .when(orderService).createOrder(any(OrderDto.class));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Bad Request: Delivery address cannot be null or empty"));
+
+        verify(orderService, times(1)).createOrder(any());
+    }
+
+
+    @Test
     void testCreateOrderWithNullItems() throws Exception {
-        OrderDto orderDto = new OrderDto(1L, 1L, null);
+        OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", null);
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new OrderItemsCannotBeNullOrEmptyException("Order items cannot be null or empty"))
@@ -160,7 +199,7 @@ class OrderControllerTest {
 
     @Test
     void testCreateOrderWithEmptyItems() throws Exception {
-        OrderDto orderDto = new OrderDto(1L, 1L, Collections.emptyList());
+        OrderDto orderDto = new OrderDto(1L, 1L, "Nizampet, Hyderabad", Collections.emptyList());
         String jsonRequestBody = objectMapper.writeValueAsString(orderDto);
 
         doThrow(new OrderItemsCannotBeNullOrEmptyException("Order items cannot be null or empty"))
@@ -412,8 +451,8 @@ class OrderControllerTest {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         List<OrderItem> orderItems = Collections.singletonList(item1);
 
-        Order order1 = new Order(1L, 1L, orderItems);
-        Order order2 = new Order(2L, 1L, orderItems);
+        Order order1 = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
+        Order order2 = new Order(2L, 1L, "Nizampet, Hyderabad", orderItems);
         List<Order> expectedOrders = Arrays.asList(order1, order2);
         String expectedResponseBody = objectMapper.writeValueAsString(expectedOrders);
 
@@ -447,7 +486,7 @@ class OrderControllerTest {
     void testGetOrderByIdSuccessfully() throws Exception {
         OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
         List<OrderItem> orderItems = Collections.singletonList(item1);
-        Order expectedOrder = new Order(1L, 1L, orderItems);
+        Order expectedOrder = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
         String expectedResponseBody = objectMapper.writeValueAsString(expectedOrder);
 
         when(orderService.getOrderById(1L)).thenReturn(expectedOrder);

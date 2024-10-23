@@ -2,6 +2,7 @@ package com.example.order.model;
 
 import com.example.order.enums.OrderStatus;
 import com.example.order.exceptions.CustomerIdCannotBeNullOrNegativeException;
+import com.example.order.exceptions.DeliveryAddressCannotBeNullOrEmpty;
 import com.example.order.exceptions.OrderItemsCannotBeNullOrEmptyException;
 import com.example.order.exceptions.RestaurantIdCannotBeNullOrNegativeException;
 import jakarta.persistence.*;
@@ -21,6 +22,8 @@ public class Order {
     private Long customerId;
     private double totalPrice;
 
+    private String deliveryAddress;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
@@ -28,18 +31,22 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
 
-    public Order(Long restaurantId, Long customerId, List<OrderItem> orderItems) {
+    public Order(Long restaurantId, Long customerId, String deliveryAddress, List<OrderItem> orderItems) {
         if (restaurantId == null || restaurantId <= 0) {
             throw new RestaurantIdCannotBeNullOrNegativeException("Restaurant ID cannot be null and must be greater than zero");
         }
         if (customerId == null || customerId <= 0) {
             throw new CustomerIdCannotBeNullOrNegativeException("Customer ID cannot be null and must be greater than zero");
         }
+        if (deliveryAddress == null || deliveryAddress.isBlank()) {
+            throw new DeliveryAddressCannotBeNullOrEmpty("Delivery address cannot be null or empty");
+        }
         if (orderItems == null || orderItems.isEmpty()) {
             throw new OrderItemsCannotBeNullOrEmptyException("Order items cannot be null or empty");
         }
         this.restaurantId = restaurantId;
         this.customerId = customerId;
+        this.deliveryAddress = deliveryAddress;
         this.totalPrice = calculateTotalPrice(orderItems);
         this.status = OrderStatus.CREATED;
         this.orderItems = orderItems;

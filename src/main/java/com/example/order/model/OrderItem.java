@@ -24,7 +24,7 @@ public class OrderItem {
         if (menuItemId == null || menuItemId <= 0) {
             throw new MenuItemIdCannotBeNullOrNegativeException("Menu item ID cannot be null and must be greater than zero");
         }
-        if (menuItemName == null || menuItemName.isEmpty()) {
+        if (menuItemName == null || menuItemName.isBlank()) {
             throw new MenuItemNameCannotBeNullOrEmptyException("Menu item name cannot be null or empty");
         }
         if (price <= 0) {

@@ -420,4 +420,51 @@ class OrderControllerTest {
 
         verify(orderService, times(1)).getOrderById(99L);
     }
+
+    @Test
+    void testUpdateOrderStatusSuccessfully() throws Exception {
+        Long orderId = 1L;
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = Collections.singletonList(item1);
+        Order order = new Order(orderId, 1L, "Nizampet, Hyderabad", orderItems);
+
+        when(orderService.updateOrderStatus(orderId)).thenReturn(order);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/orders/" + orderId + "/status")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Order status updated to OUT FOR DELIVERY for order ID: " + orderId));
+
+        verify(orderService, times(1)).updateOrderStatus(orderId);
+    }
+
+    @Test
+    void testUpdateOrderStatusWhenOrderNotFound() throws Exception {
+        Long orderId = 99L;
+
+        doThrow(new OrderNotFoundException("Order not found with id: " + orderId))
+                .when(orderService).updateOrderStatus(orderId);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/orders/" + orderId + "/status")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Not Found: Order not found with id: " + orderId));
+
+        verify(orderService, times(1)).updateOrderStatus(orderId);
+    }
+
+    @Test
+    void testUpdateOrderStatusWhenServerErrorOccurs() throws Exception {
+        Long orderId = 1L;
+
+        doThrow(new RuntimeException("Unexpected error"))
+                .when(orderService).updateOrderStatus(orderId);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/orders/" + orderId + "/status")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string("An error occurred: Unexpected error"));
+
+        verify(orderService, times(1)).updateOrderStatus(orderId);
+    }
 }

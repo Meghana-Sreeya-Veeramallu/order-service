@@ -1,6 +1,7 @@
 package com.example.order.service;
 
 import com.example.order.dto.MenuItemDto;
+import com.example.order.enums.OrderStatus;
 import com.example.order.exceptions.*;
 import com.example.order.model.Order;
 import com.example.order.model.OrderItem;
@@ -61,5 +62,16 @@ public class OrderService {
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
+    }
+
+    public Order updateOrderStatus(Long orderId) {
+        Order order = getOrderById(orderId);
+
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new CannotUpdateOrderStatusException("Order status can only be updated from CREATED to OUT FOR DELIVERY");
+        }
+
+        order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
+        return orderRepository.save(order);
     }
 }

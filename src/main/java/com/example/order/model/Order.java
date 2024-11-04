@@ -7,6 +7,7 @@ import com.example.order.exceptions.OrderItemsCannotBeNullOrEmptyException;
 import com.example.order.exceptions.RestaurantIdCannotBeNullOrNegativeException;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class Order {
 
     private String deliveryAddress;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 

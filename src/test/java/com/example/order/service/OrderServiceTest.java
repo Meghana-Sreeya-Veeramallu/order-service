@@ -2,6 +2,7 @@ package com.example.order.service;
 
 import com.example.order.dto.MenuItemDto;
 import com.example.order.dto.OrderDto;
+import com.example.order.enums.OrderStatus;
 import com.example.order.exceptions.*;
 import com.example.order.model.Order;
 import com.example.order.model.OrderItem;
@@ -243,5 +244,32 @@ class OrderServiceTest {
             orderService.getOrderById(99L);
         });
         assertEquals("Order not found with id: 99", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateOrderStatusSuccessfully() {
+        OrderItem item1 = new OrderItem(1L, "Pizza", 199.0, 2);
+        List<OrderItem> orderItems = Collections.singletonList(item1);
+        Order order = new Order(1L, 1L, "Nizampet, Hyderabad", orderItems);
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(orderRepository.save(order)).thenReturn(order);
+
+        Order updatedOrder = orderService.updateOrderStatus(1L);
+
+        assertEquals(OrderStatus.OUT_FOR_DELIVERY, updatedOrder.getStatus());
+        verify(orderRepository, times(1)).save(order);
+    }
+
+    @Test
+    void testUpdateOrderStatusWhenOrderNotFound() {
+        when(orderRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(OrderNotFoundException.class, () -> {
+            orderService.updateOrderStatus(99L);
+        });
+
+        assertEquals("Order not found with id: 99", exception.getMessage());
+        verify(orderRepository, times(0)).save(any(Order.class));
     }
 }

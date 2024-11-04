@@ -37,5 +37,12 @@ public class OrderController {
         Order order = orderService.getOrderById(orderId);
         return ResponseEntity.ok(order);
     }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<String> updateOrderStatus(@PathVariable Long orderId) {
+        orderService.updateOrderStatus(orderId);
+        String successMessage = "Order status updated to OUT FOR DELIVERY for order ID: " + orderId;
+        return ResponseEntity.ok(successMessage);
+    }
 }
 
